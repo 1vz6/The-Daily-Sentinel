@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publicar matéria — The Daily Sentinel</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗞️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1 class="masthead__name" style="font-size:clamp(1.8rem,5vw,2.6rem);"><a href="index.html">The Daily Sentinel</a></h1>
+  </div>
+</header>
+<hr class="rule rule--strong">
+<nav class="nav">
+  <div class="wrap">
+    <ul class="nav__list">
+      <li><a href="index.html" style="padding:4px 2px;">&larr; Voltar à capa</a></li>
+    </ul>
+  </div>
+</nav>
+<hr class="rule rule--thin">
+
+<main class="wrap" style="padding:34px 0 80px;">
+  <div class="publish">
+    <h2>Publicar nova matéria</h2>
+    <p class="publish__intro">
+      Preencha os campos abaixo. O formulário gera automaticamente o bloco pronto para você
+      colar dentro do arquivo <code>noticias.json</code>. Depois é só salvar e subir (commit + push)
+      para o GitHub — a matéria aparece no site para todos os visitantes.
+    </p>
+
+    <form id="form-materia">
+      <div class="field">
+        <label for="titulo">Título</label>
+        <input id="titulo" required placeholder="Ex: A Revolução Silenciosa da Leitura Analógica">
+      </div>
+
+      <div class="field">
+        <label for="resumo">Resumo (linha-fina, aparece na capa)</label>
+        <textarea id="resumo" required placeholder="Uma ou duas frases que resumem a matéria."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="texto">Texto completo</label>
+        <textarea id="texto" required style="min-height:220px;" placeholder="Corpo da matéria. Separe parágrafos com uma linha em branco."></textarea>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label for="autor">Autor</label>
+          <input id="autor" required value="Ruan Gabriel">
+        </div>
+        <div class="field">
+          <label for="caderno">Caderno (seção)</label>
+          <input id="caderno" required placeholder="Ex: Cultura & Educação" list="cadernos-existentes">
+          <datalist id="cadernos-existentes"></datalist>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field">
+          <label for="data">Data</label>
+          <input id="data" type="date" required>
+        </div>
+        <div class="field">
+          <label for="imagem">URL de imagem (opcional)</label>
+          <input id="imagem" type="url" placeholder="https://...">
+        </div>
+      </div>
+
+      <div class="field">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="destaque" style="width:auto;">
+          Colocar como manchete principal da capa
+        </label>
+      </div>
+
+      <button type="submit" class="btn">Gerar bloco JSON</button>
+    </form>
+
+    <div class="output-block" id="output-block" style="display:none;">
+      <h3>Copie o bloco abaixo e cole dentro do array em <code>noticias.json</code></h3>
+      <textarea id="output" readonly></textarea>
+      <div class="copy-row">
+        <button class="btn btn--ghost" id="btn-copiar" type="button">Copiar</button>
+        <span class="copied-msg" id="copied-msg">Copiado!</span>
+      </div>
+      <p class="output-note">
+        Abra <code>noticias.json</code>, cole este bloco como um novo item dentro dos colchetes <code>[ ]</code>
+        (separado dos outros por vírgula), salve, e faça commit + push no GitHub.
+        Se marcou "manchete principal", lembre-se de tirar o <code>"destaque": true</code> da matéria anterior,
+        se quiser que só uma fique em destaque por vez.
+      </p>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>The Daily Sentinel</strong> &mdash; publicação independente</p>
+  </div>
+</footer>
+
+<script>
+// preenche a lista de cadernos já existentes, se noticias.json estiver acessível
+fetch('noticias.json').then(r => r.ok ? r.json() : []).then(lista => {
+  const cadernos = [...new Set((lista || []).map(n => n.caderno))];
+  const datalist = document.getElementById('cadernos-existentes');
+  datalist.innerHTML = cadernos.map(c => `<option value="${c}">`).join('');
+}).catch(() => {});
+
+document.getElementById('data').valueAsDate = new Date();
+
+function gerarId(titulo) {
+  return titulo
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .slice(0, 60);
+}
+
+document.getElementById('form-materia').addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const titulo = document.getElementById('titulo').value.trim();
+  const obj = {
+    id: gerarId(titulo) || 'materia-' + Date.now(),
+    titulo,
+    resumo: document.getElementById('resumo').value.trim(),
+    texto: document.getElementById('texto').value.trim(),
+    autor: document.getElementById('autor').value.trim(),
+    caderno: document.getElementById('caderno').value.trim(),
+    data: document.getElementById('data').value,
+    destaque: document.getElementById('destaque').checked,
+    imagem: document.getElementById('imagem').value.trim()
+  };
+
+  const bloco = ',\n  ' + JSON.stringify(obj, null, 2).split('\n').join('\n  ');
+
+  document.getElementById('output').value = bloco;
+  document.getElementById('output-block').style.display = 'block';
+  document.getElementById('output-block').scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('copied-msg').classList.remove('is-visible');
+});
+
+document.getElementById('btn-copiar').addEventListener('click', async function () {
+  const output = document.getElementById('output');
+  output.select();
+  try {
+    await navigator.clipboard.writeText(output.value);
+  } catch {
+    document.execCommand('copy');
+  }
+  document.getElementById('copied-msg').classList.add('is-visible');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Daily Sentinel</title>
+<meta name="description" content="The Daily Sentinel — jornalismo diário sobre educação, sociedade, tecnologia e comportamento.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗞️</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span id="topbar-date" class="topbar__date"></span>
+    <span class="topbar__tag">Edição digital &mdash; atualizada continuamente</span>
+  </div>
+</div>
+
+<div class="ticker">
+  <div class="ticker__label">Últimas</div>
+  <div class="ticker__track"><ul class="ticker__list" id="ticker-list"></ul></div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1 class="masthead__name"><a href="#/">The Daily Sentinel</a></h1>
+    <p class="masthead__tagline">Vigilância atenta sobre educação, sociedade e o mundo em transformação</p>
+  </div>
+</header>
+
+<hr class="rule rule--strong">
+
+<nav class="nav">
+  <div class="wrap nav__row">
+    <ul class="nav__list" id="nav-list">
+      <li><button data-caderno="" class="is-active">Capa</button></li>
+    </ul>
+    <form class="nav__search" id="form-busca" role="search">
+      <input type="search" id="input-busca" placeholder="Buscar matérias&hellip;" aria-label="Buscar matérias">
+    </form>
+    <div class="nav__publish"><a href="nova-materia.html">+ Publicar matéria</a></div>
+  </div>
+</nav>
+
+<hr class="rule rule--thin">
+
+<main class="wrap" id="main">
+  <p class="empty-state">Carregando edição de hoje&hellip;</p>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>The Daily Sentinel</strong> &mdash; publicação independente</p>
+    <p>Redação: Ruan Gabriel &middot; Todas as matérias &copy; <span id="footer-year"></span></p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
